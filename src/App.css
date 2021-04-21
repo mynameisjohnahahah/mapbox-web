@@ -4,21 +4,21 @@ body {
 }
 
 button {
-  width: 70px; /* 宽度 */
-  height: 30px; /* 高度 */
-  border-width: 0px; /* 边框宽度 */
-  border-radius: 3px; /* 边框半径 */
-  background: #1e90ff; /* 背景颜色 */
-  cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
-  outline: none; /* 不显示轮廓线 */
-  font-family: Microsoft YaHei; /* 设置字体 */
-  color: white; /* 字体颜色 */
-  font-size: 17px; /* 字体大小 */
+  min-width: 70px;
+  height: 35px;
+  border-width: 0px;
+  border-radius: 3px;
+  background: #1e90ff;
+  cursor: pointer;
+  outline: none;
+  font-family: Microsoft YaHei;
+  color: white;
+  font-size: 17px;
 }
 
 input {
   border: 1px solid #ccc;
-  padding: 7px 0px;
+  padding: 10px 0px;
   border-radius: 3px;
   padding-left: 5px;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -42,4 +42,8 @@ input:focus {
   top: 50px;
   bottom: 0;
   width: 100%;
+}
+
+.selectOption {
+  width: 150px;
 }

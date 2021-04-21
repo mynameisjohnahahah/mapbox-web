@@ -8,4 +8,12 @@ function getFloorList() {
   });
 }
 
-export { getFloorList };
+function getFloorMap(param) {
+  return new Promise((resolve, reject) => {
+    http('get', '/api/map_data/floor_index', param).then(res => {
+      resolve(res);
+    });
+  });
+}
+
+export { getFloorList, getFloorMap };

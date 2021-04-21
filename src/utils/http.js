@@ -1,5 +1,6 @@
 import axios from 'axios';
-import moment from 'moment';
+// import moment from 'moment';
+// import { getQueryVariable } from '../helper';
 
 // 网络请求配置
 axios.defaults.timeout = 100000;
@@ -9,15 +10,23 @@ axios.defaults.baseURL = 'https://test-easy.mall-to.com';
 axios.interceptors.request.use(
   config => {
     config.data = JSON.stringify(config.data);
-    config.headers = {
-      'Content-Type': 'application/json',
-      UUID: 4006,
-      'App-Id': 999,
-      'app-secret': 'testsecret',
-      'Signature-Version': 4,
-      Timestamp: moment().format('YYYY-MM-DD hh:mm:ss'),
-      Accept: 'application/json'
-    };
+    // config.headers = {
+    //   'Content-Type': 'application/json',
+    //   uuid: getQueryVariable('uuid'),
+    //   'app-id': 999,
+    //   'app-secret': 'testsecret',
+    //   'signature-version': 4,
+    //   timestamp: moment().format('YYYY-MM-DD hh:mm:ss'),
+    //   accept: 'application/json'
+    //   // 'signature-nonce': '',
+    //   // signature: ''
+    // };
+    // config.headers = {
+    //   'app-id': '999',
+    //   'app-secret': 'testsecret',
+    //   uuid: getQueryVariable('uuid'),
+    //   host: 'https://test-easy.mall-to.com'
+    // };
     return config;
   },
   error => {
