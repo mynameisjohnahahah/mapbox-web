@@ -6,30 +6,36 @@ import Select from 'react-select';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { getFloorMap } from './utils/api';
+import { getFloorMap, getBeacon } from './utils/api';
 import MallToLocation from './lib/location/mall-to-location-sdk-es';
 import { getQueryVariable } from './helper';
 
 import './app.css';
 
+mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VmZm9saXUiLCJhIjoiY2pvZm9xeWN3MDFoejNrcnhrZWJ3cWY3byJ9.QlGQk9NBBKzz7dsWpU6a6A';
+
 const mallToLocation = new MallToLocation({
   appId: '999',
   appSecret: 'testsecret',
   uuid: getQueryVariable('uuid'),
-  host: 'https://test-easy.mall-to.com'
+  host: process.env.REACT_APP_BASE_URL
 });
 
 const App = () => {
   const [macValue, setMacValue] = useState();
   const [loading, setLoading] = useState(false);
   const [selectedOption, setSelectOption] = useState('mac');
+  const [mapState, setMap] = useState(null);
+  const [floor, setFloor] = useState(null);
+  const [isShowBeacon, setShowBeacon] = useState(false);
+
+  let map = null;
+  let loadMap = false;
 
   const options = [
     { value: 'mac', label: '工卡' },
     { value: 'openid', label: '微信' }
   ];
-  let map = null;
-  let loadMap = false;
 
   const marker = new mapboxgl.Marker(); // 定义坐标点
 
@@ -37,12 +43,13 @@ const App = () => {
   let oldCoordinate = null;
   let newCoordinate = null;
 
-  const moveTime = 1000; // 平滑移动到下一个位置的时间
-
+  const moveTime = 5000; // 平滑移动到下一个位置的时间
   let useTime = 0; // 已经平滑移动的时间
+  let delay = 0;
+  let interval = 5000;
 
   // 定位sdk返回的点位信息
-  function update(ressult) {
+  const update = ressult => {
     if (ressult.success) {
       const point = ressult.data.position;
       if (!newCoordinate) {
@@ -53,10 +60,10 @@ const App = () => {
       }
       useTime = 0;
     }
-  }
+  };
 
   // 逐帧更新坐标点
-  function animateMarker() {
+  const animateMarker = () => {
     // 每帧的移动时间
     useTime += moveTime / 60;
     // 确保有定位点
@@ -81,8 +88,9 @@ const App = () => {
 
     //请求动画的下一帧。
     requestAnimationFrame(animateMarker);
-  }
+  };
 
+  // 搜索
   const searchLocation = () => {
     if (!macValue) {
       toast.error(selectedOption === 'mac' ? '请输入工卡！' : '请输入微信号！', {
@@ -96,10 +104,10 @@ const App = () => {
       });
       return;
     }
-    let delay = 0;
-    let interval = 1000;
+
     setLoading(true);
     loadMap = true;
+
     mallToLocation.onPosition(
       selectedOption === 'openid' ? { openid: macValue } : { mac: macValue },
       { delay, interval },
@@ -109,18 +117,19 @@ const App = () => {
             getFloorMap({
               floor_id: res.data.floor_id
             }).then(response => {
-              mapboxgl.accessToken =
-                'pk.eyJ1IjoiZ2VmZm9saXUiLCJhIjoiY2pvZm9xeWN3MDFoejNrcnhrZWJ3cWY3byJ9.QlGQk9NBBKzz7dsWpU6a6A';
-              map = new mapboxgl.Map({
+              const mapContainer = new mapboxgl.Map({
                 container: 'map',
                 style: response
               });
+
+              map = mapContainer;
+              setMap(mapContainer);
             });
 
             setLoading(false);
             loadMap = false;
+            setFloor(res.data.floor_id);
           }
-
           update(res);
           animateMarker();
         }
@@ -128,8 +137,60 @@ const App = () => {
     );
   };
 
+  // 显示beacon
   const showBeacon = () => {
-    if (!map) return;
+    if (!mapState || isShowBeacon) return;
+
+    getBeacon({
+      floor_id: floor
+    }).then(res => {
+      const features = res.map(v => {
+        return {
+          type: 'Feature',
+          properties: {
+            type: 'gateway',
+            name: v.mac
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [Number(v.longitude), Number(v.latitude)]
+          }
+        };
+      });
+
+      mapState.addSource('gateway', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: features
+        }
+      });
+
+      mapState.addLayer({
+        id: 'gateway-point',
+        type: 'circle',
+        source: 'gateway',
+        paint: {
+          'circle-radius': 6,
+          'circle-color': '#223b53'
+        }
+      });
+
+      mapState.addLayer({
+        id: 'gateway',
+        type: 'symbol',
+        source: 'gateway',
+        layout: {
+          'text-font': ['PingFang SC Regular'],
+          'text-field': ['get', 'name'],
+          'text-size': 12,
+          'text-offset': [0, 0.6],
+          'text-anchor': 'top'
+        }
+      });
+
+      setShowBeacon(true);
+    });
   };
 
   return (
@@ -153,7 +214,7 @@ const App = () => {
           查询
         </button>
 
-        <button style={{ margin: '0 0 0 10px' }} onClick={() => showBeacon()}>
+        <button style={{ margin: '0 0 0 10px' }} onClick={() => showBeacon()} disabled={isShowBeacon}>
           显示beacon
         </button>
       </div>

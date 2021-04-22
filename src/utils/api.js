@@ -16,4 +16,12 @@ function getFloorMap(param) {
   });
 }
 
-export { getFloorList, getFloorMap };
+function getBeacon(params) {
+  return new Promise((resolve, reject) => {
+    http('get', '/api/beacon', params).then(res => {
+      resolve(res);
+    });
+  });
+}
+
+export { getFloorList, getFloorMap, getBeacon };

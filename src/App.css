@@ -16,6 +16,15 @@ button {
   font-size: 17px;
 }
 
+button:disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  opacity: 0.65;
+}
+
 input {
   border: 1px solid #ccc;
   padding: 10px 0px;

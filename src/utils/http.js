@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // 网络请求配置
 axios.defaults.timeout = 100000;
-axios.defaults.baseURL = 'https://test-easy.mall-to.com';
+axios.defaults.baseURL = process.env.REACT_APP_BASE_URL;
 
 // http request 拦截器
 axios.interceptors.request.use(
@@ -18,14 +18,6 @@ axios.interceptors.request.use(
     //   'signature-version': 4,
     //   timestamp: moment().format('YYYY-MM-DD hh:mm:ss'),
     //   accept: 'application/json'
-    //   // 'signature-nonce': '',
-    //   // signature: ''
-    // };
-    // config.headers = {
-    //   'app-id': '999',
-    //   'app-secret': 'testsecret',
-    //   uuid: getQueryVariable('uuid'),
-    //   host: 'https://test-easy.mall-to.com'
     // };
     return config;
   },
@@ -40,7 +32,7 @@ axios.interceptors.response.use(
     return response;
   },
   error => {
-    // msag(error);
+    // message(error);
     console.log('请求出错：', error);
   }
 );
@@ -101,7 +93,7 @@ export function patch(url, data = {}) {
         resolve(response.data);
       },
       err => {
-        msag(err);
+        message(err);
         reject(err);
       }
     );
@@ -122,7 +114,7 @@ export function put(url, data = {}) {
         resolve(response.data);
       },
       err => {
-        msag(err);
+        message(err);
         reject(err);
       }
     );
@@ -130,7 +122,7 @@ export function put(url, data = {}) {
 }
 
 //失败提示
-function msag(err) {
+function message(err) {
   if (err && err.response) {
     switch (err.response.status) {
       case 401:

@@ -8,11 +8,15 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
+    "compression-webpack-plugin": "^5.0.1",
     "crypto-js": "^4.0.0",
+    "customize-cra": "^1.0.0",
     "dayjs": "^1.10.4",
+    "dotenv-cli": "^4.0.0",
     "mapbox-gl": "^2.2.0",
     "moment": "^2.29.1",
     "react": "^17.0.2",
+    "react-app-rewired": "^2.1.8",
     "react-dom": "^17.0.2",
     "react-loading": "^2.0.3",
     "react-scripts": "4.0.3",
@@ -22,9 +26,12 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "start:integration": "dotenv -e .env.integration react-app-rewired start",
+    "start:testing": "dotenv -e .env.testing react-app-rewired start",
+    "test": "react-app-rewired test --env=jsdom",
+    "build:integration": "dotenv -e .env.integration react-app-rewired build",
+    "build:testig": "dotenv -e .env.testing react-app-rewired build",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
